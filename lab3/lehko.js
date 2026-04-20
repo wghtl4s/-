@@ -59,7 +59,7 @@ function renderWithoutFlyweight(text) {
 
         let element = new LightElementNode(tag);
         let textNode = new LightTextNode(line);
-        totalObjects += 2; // 1 тег + 1 текст
+        totalObjects += 2;
     }
     console.log(`[Пам'ять] БЕЗ Легковаговика створено об'єктів: ${totalObjects}`);
 }
