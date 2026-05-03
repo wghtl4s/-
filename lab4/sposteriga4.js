@@ -33,4 +33,4 @@ button.addEventListener("mouseover", function() {
     console.log("Подія mouseover успішно спрацювала!");
 });
 
-button.trigger("click");
+button.trigger("click");// force update
