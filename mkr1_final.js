@@ -1,21 +1,31 @@
+class NodeState {
+    renderHTML(node) {}
+}
+
+class VisibleState extends NodeState {
+    renderHTML(node) {
+        return node.getActualHTML();
+    }
+}
+
+class HiddenState extends NodeState {
+    renderHTML(node) {
+        return "<!-- прихований елемент -->";
+    }
+}
+
 class LightNode {
-    getOuterHTML() {}
+    constructor() {
+        this.state = new VisibleState();
+    }
+    changeState(newState) {
+        this.state = newState;
+    }
+    getOuterHTML() {
+        return this.state.renderHTML(this);
+    }
+    getActualHTML() {}
     getInnerHTML() {}
-
-    render() {
-        this.onCreated();
-        let result = this.getOuterHTML();
-        this.onRendered();
-        return result;
-    }
-
-    onCreated() {
-        console.log("Елемент почав створюватися");
-    }
-
-    onRendered() {
-        console.log("Елемент успішно створено");
-    }
 }
 
 class LightTextNode extends LightNode {
@@ -23,7 +33,7 @@ class LightTextNode extends LightNode {
         super();
         this.text = text;
     }
-    getOuterHTML() {
+    getActualHTML() {
         return this.text;
     }
     getInnerHTML() {
@@ -50,7 +60,7 @@ class LightElementNode extends LightNode {
         }
         return html;
     }
-    getOuterHTML() {
+    getActualHTML() {
         let classString = "";
         if (this.cssClasses.length > 0) {
             let classesJoined = "";
@@ -84,4 +94,5 @@ th.addChild(thText);
 tr.addChild(th);
 table.addChild(tr);
 
-console.log(table.render());
+tr.changeState(new HiddenState());
+console.log(table.getOuterHTML());
