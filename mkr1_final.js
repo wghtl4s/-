@@ -1,27 +1,25 @@
-class SimpleIterator {
-    constructor(elements) {
-        this.elements = elements;
-        this.index = 0;
+class Visitor {
+    visitElement(node) {
+        console.log("Я відвідав тег: " + node.tag);
     }
-    hasNext() {
-        return this.index < this.elements.length;
-    }
-    next() {
-        let current = this.elements[this.index];
-        this.index = this.index + 1;
-        return current;
+    visitText(node) {
+        console.log("Я відвідав текст: " + node.text);
     }
 }
 
 class LightNode {
     getOuterHTML() {}
     getInnerHTML() {}
+    accept(visitor) {}
 }
 
 class LightTextNode extends LightNode {
     constructor(text) {
         super();
         this.text = text;
+    }
+    accept(visitor) {
+        visitor.visitText(this);
     }
     getOuterHTML() {
         return this.text;
@@ -43,8 +41,11 @@ class LightElementNode extends LightNode {
     addChild(node) {
         this.children.push(node);
     }
-    getIterator() {
-        return new SimpleIterator(this.children);
+    accept(visitor) {
+        visitor.visitElement(this);
+        for (let i = 0; i < this.children.length; i++) {
+            this.children[i].accept(visitor);
+        }
     }
     getInnerHTML() {
         let html = "";
@@ -81,15 +82,10 @@ class LightElementNode extends LightNode {
 
 let table = new LightElementNode("table", "block", "paired", ["table-class"]);
 let tr = new LightElementNode("tr", "block", "paired", []);
-let td1 = new LightElementNode("td", "inline", "paired", []);
-let td2 = new LightElementNode("td", "inline", "paired", []);
+let thText = new LightTextNode("Заголовок");
 
-tr.addChild(td1);
-tr.addChild(td2);
+tr.addChild(thText);
 table.addChild(tr);
 
-let iterator = tr.getIterator();
-while (iterator.hasNext()) {
-    let node = iterator.next();
-    console.log("Знайдено дочірній тег:", node.tag);
-}
+let myVisitor = new Visitor();
+table.accept(myVisitor);
