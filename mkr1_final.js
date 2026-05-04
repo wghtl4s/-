@@ -1,30 +1,20 @@
-class NodeState {
-    renderHTML(node) {}
+class Command {
+    execute() {}
 }
 
-class VisibleState extends NodeState {
-    renderHTML(node) {
-        return node.getActualHTML();
+class AddChildCommand extends Command {
+    constructor(parent, child) {
+        super();
+        this.parent = parent;
+        this.child = child;
     }
-}
-
-class HiddenState extends NodeState {
-    renderHTML(node) {
-        return "<!-- прихований елемент -->";
+    execute() {
+        this.parent.children.push(this.child);
     }
 }
 
 class LightNode {
-    constructor() {
-        this.state = new VisibleState();
-    }
-    changeState(newState) {
-        this.state = newState;
-    }
-    getOuterHTML() {
-        return this.state.renderHTML(this);
-    }
-    getActualHTML() {}
+    getOuterHTML() {}
     getInnerHTML() {}
 }
 
@@ -33,7 +23,7 @@ class LightTextNode extends LightNode {
         super();
         this.text = text;
     }
-    getActualHTML() {
+    getOuterHTML() {
         return this.text;
     }
     getInnerHTML() {
@@ -51,7 +41,8 @@ class LightElementNode extends LightNode {
         this.children = [];
     }
     addChild(node) {
-        this.children.push(node);
+        let command = new AddChildCommand(this, node);
+        command.execute();
     }
     getInnerHTML() {
         let html = "";
@@ -60,7 +51,7 @@ class LightElementNode extends LightNode {
         }
         return html;
     }
-    getActualHTML() {
+    getOuterHTML() {
         let classString = "";
         if (this.cssClasses.length > 0) {
             let classesJoined = "";
@@ -90,9 +81,9 @@ let table = new LightElementNode("table", "block", "paired", ["table-class"]);
 let tr = new LightElementNode("tr", "block", "paired", []);
 let th = new LightElementNode("th", "inline", "paired", []);
 let thText = new LightTextNode("Заголовок");
+
 th.addChild(thText);
 tr.addChild(th);
 table.addChild(tr);
 
-tr.changeState(new HiddenState());
 console.log(table.getOuterHTML());
